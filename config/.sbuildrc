@@ -1,0 +1,14 @@
+$log_dir="/home/<username>/Projects/logs";
+
+$lintian_opts = ["-L", ">=pedantic", "--show-overrides", "--color", "auto"];
+
+$run_autopkgtest = 1;
+$autopkgtest_opts = ['--', 'schroot', '<codename>'];
+
+$apt_clean = 0;
+$clean_source = 0;
+
+$purge_build_directory = 'successful';
+
+# don't remove this, Perl needs it at the end of the file:
+1;

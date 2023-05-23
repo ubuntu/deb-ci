@@ -1,0 +1,78 @@
+on:
+  workflow_call:
+    inputs:
+      branch:
+        type: string
+        description: Git branch to build
+        default: debian/master
+      series:
+        type: string
+        description: Build series
+        default: jammy
+  workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        description: Git branch to build
+        default: debian/master
+      series:
+        type: string
+        description: Build series
+        default: jammy
+
+jobs:
+  gbp-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git-buildpackage ubuntu-dev-tools sbuild-launchpad-chroot gnome-pkg-tools
+      - name: Configure Chroot
+        run: |
+          sudo sbuild-launchpad-chroot create -n ${{ github.event.inputs.series }} -s ${{ github.event.inputs.series }} -a amd64
+          # echo 'command-prefix=eatmydata' | sudo tee -a /etc/schroot/chroot.d/${{ github.event.inputs.series }}
+          # sudo schroot -c source:${{ github.event.inputs.series }} sudo apt update; sudo apt install debhelper eatmydata
+      - name: Configure GBP
+        run: |
+          cp config/.gbp.conf ~/
+          sed -i "s/${{ github.event.inputs.series }}>/${{ github.event.inputs.series }}/g" ~/.gbp.conf
+      - name: Configure Devscripts
+        run: |
+          cp config/.devscripts ~/
+          sed -i "s/<gpg.key>/${{ secrets.GPG_FINGERPRINT }}/g" ~/.devscripts
+          sed -i "s/<name>/${{ secrets.LP_USER }}/g" ~/.devscripts
+          sed -i "s/<email>/${{ secrets.LP_EMAIL }}/g" ~/.devscripts
+      - name: Configure SBuild
+        run: |
+          sudo sbuild-adduser runner
+          cp config/.sbuildrc ~/
+          sed -i "s/${{ github.event.inputs.series }}>/${{ github.event.inputs.series }}/g" ~/.sbuildrc
+      - name: Import Keys
+        run: |
+          sudo apt update
+          sudo apt install -y ca-certificates
+          echo "${{ secrets.GPG_PUB_KEY }}" > pub.key
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" > private.key
+          gpg --import pub.key
+          gpg --import private.key
+          rm *.key
+      - name: Clone Repository
+        run: |
+          git clone ${{ secrets.FORK }} project
+          cd project
+          git checkout pristine-tar
+          git checkout ${{ github.event.inputs.branch }}
+      - name: Build Package
+        run: |
+          mkdir build-area
+          mkdir tarballs
+          sudo -H -u runner bash -c "cd project;  gbp buildpackage --git-builder='debuild -S -nc'"
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: deb-artifacts
+          path: |
+            ~/work/deb-ci/deb-ci/build-area/*
+            ~/work/deb-ci/deb-ci/tarballs/*
