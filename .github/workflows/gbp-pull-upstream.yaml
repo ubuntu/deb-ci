@@ -1,0 +1,52 @@
+on:
+  workflow_call:
+    inputs:
+      fork:
+        type: string
+        description: Forked repository to clone
+        required: true
+  workflow_dispatch:
+      fork:
+        type: string
+        description: Forked repository to clone
+        required: true
+
+jobs:
+  gbp-pull-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git git-buildpackage
+      - name: Configure Environment
+        run: |
+          git clone ${{ github.event.inputs.fork }} project
+          cd project
+          git remote add upstreamvcs $(grep -r Repository: debian/upstream/metadata | cut -c 13-)
+          git fetch --all
+          git config user.email ${{ secrets.LP_EMAIL }}
+          git config user.name "${{ secrets.LP_USER }}"
+      - name: Checkout Branches
+        run: |
+          cd project
+          git checkout --track origin/pristine-tar
+          git checkout --track origin/upstream/latest
+          git checkout debian/master          
+      - name: Update Changelog and Rebase Patches
+        run: |
+          cd project
+          gbp pq import
+          gbp pq export
+          dch -i "New upstream release"
+          git add debian
+          git commit -m "Update changelog and rebase patches"
+      - name: Import Upstream
+        run: |
+          cd project
+          gbp import-orig --uscan --no-interactive
+      - name: Push Branches
+        run: |
+          cd project
+          gbp push
+          git push origin debian/master
