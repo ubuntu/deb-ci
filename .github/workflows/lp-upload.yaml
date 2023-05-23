@@ -1,0 +1,38 @@
+on:
+  workflow_call:
+
+jobs:
+  launchpad-upload:
+    name: LP Upload
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Configure Dput
+        run: |
+          cp config/.dput.cf ~/
+          sed -i "s/<your_launchpad_id>/${{ secrets.LP_USER }}/g" ~/.dput.cf
+          sed -i "s/<ppa_name>/testing/g" ~/.dput.cf
+      - name: Import Keys
+        run: |
+          sudo apt update
+          sudo apt install -y ca-certificates
+          echo "${{ secrets.GPG_PUB_KEY }}" > pub.key
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" > private.key
+          gpg --import pub.key
+          gpg --import private.key
+          rm *.key
+      - uses: actions/download-artifact@v3
+        with:
+          name: deb-artifacts
+      - name: Sign Changes
+        run: |
+          sudo apt update
+          sudo apt install -y devscripts
+          FINGERPRINT=$(gpg --list-keys --with-colons --fingerprint | awk -F: '$1 == "fpr" {print $10;}' | awk 'NR==1{print $1}')
+          debsign -k $FINGERPRINT ./build-area/*.changes
+      - name: Upload to Launchpad
+        run: |
+          dput my-ppa ./build-area/*source.changes
