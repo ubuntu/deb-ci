@@ -1,5 +1,14 @@
 on:
   workflow_call:
+    inputs:
+      ppa:
+        type: string
+        description: PPA of the LP user to upload package
+        default: ppa
+      package:
+        type: string
+        description: Name of package to be uploaded
+        required: true
 
 jobs:
   launchpad-upload:
@@ -14,7 +23,7 @@ jobs:
         run: |
           cp config/.dput.cf ~/
           sed -i "s/<your_launchpad_id>/${{ secrets.LP_USER }}/g" ~/.dput.cf
-          sed -i "s/<ppa_name>/testing/g" ~/.dput.cf
+          sed -i "s/<ppa_name>/${{ github.event.inputs.ppa }}/g" ~/.dput.cf
       - name: Import Keys
         run: |
           sudo apt update
@@ -26,7 +35,7 @@ jobs:
           rm *.key
       - uses: actions/download-artifact@v3
         with:
-          name: deb-artifacts
+          name: ${{ github.event.inputs.package }}
       - name: Sign Changes
         run: |
           sudo apt update
