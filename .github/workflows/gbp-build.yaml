@@ -1,6 +1,10 @@
 on:
   workflow_call:
     inputs:
+      repo:
+        type: string
+        required: true
+        description: Repository to build
       branch:
         type: string
         description: Git branch to build
@@ -11,6 +15,10 @@ on:
         default: jammy
   workflow_dispatch:
     inputs:
+      repo:
+        type: string
+        required: true
+        description: Repository to build
       branch:
         type: string
         description: Git branch to build
@@ -25,6 +33,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Get Project Name
+        id: get-project-name
+        run: |
+          echo "project-name=$(basename ${{ github.event.inputs.repo }}" .git) >> $GITHUB_OUTPUT
       - name: Install Dependencies
         run: |
           sudo apt update
@@ -60,7 +72,7 @@ jobs:
           rm *.key
       - name: Clone Repository
         run: |
-          git clone ${{ secrets.FORK }} project
+          git clone ${{ github.event.inputs.repo }} project
           cd project
           git checkout pristine-tar
           git checkout ${{ github.event.inputs.branch }}
@@ -72,7 +84,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: deb-artifacts
+          name: ${{ steps.get-project-name.outputs.project-name }}"
           path: |
             ~/work/deb-ci/deb-ci/build-area/*
             ~/work/deb-ci/deb-ci/tarballs/*
