@@ -1,0 +1,53 @@
+name: GBP Merge and LP Upload
+on:
+  workflow_call:
+    inputs:
+      target-branch:
+        type: string
+        default: ubuntu/master
+      source:
+        type: string
+        default: debian/master
+      series:
+        type: string
+        default: jammy
+      repo:
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      target-branch:
+        type: string
+        default: ubuntu/master
+      source:
+        type: string
+        default: debian/master
+      series:
+        type: string
+        default: jammy
+      repo:
+        type: string
+        required: true
+
+jobs:
+  gbp-merge:
+    uses: ./.github/workflows/gbp-merge.yaml
+    secrets: inherit
+    with:
+      repo: ${{ inputs.repo }}
+      target-branch: ${{ inputs.target-branch }}
+      source: ${{ inputs.source }}
+  gbp-build:
+    uses: ./.github/workflows/gbp-build.yaml
+    needs: [gbp-merge]
+    secrets: inherit
+    with:
+      repo: ${{ inputs.repo }}
+      branch: ${{ inputs.target-branch }}
+      series: ${{ inputs.series }}
+  lp-upload:
+    uses: ./.github/workflows/lp-upload.yaml
+    needs: [gbp-build]
+    secrets: inherit
+    with:
+      ppa: testing
