@@ -38,9 +38,11 @@ jobs:
           cd project
           gbp pq import
           gbp pq export
-          dch -i "New upstream release"
           git add debian
-          git commit -m "Update changelog and rebase patches"
+          git commit -m "Rebase patches" || true
+          gbp dch
+          git add debian
+          git commit -m "Update changelog" || true
       - name: Import Upstream
         run: |
           cd project
