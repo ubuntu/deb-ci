@@ -2,7 +2,6 @@ DEBCHANGE_AUTO_NMU=no
 DEBCOMMIT_SIGN_TAGS=yes
 DEBEMAIL=<email>
 DEBFULLNAME="<name>"
-UBUMAIL=<email>
 DEBSIGN_KEYID=<gpg.key>
 GPGKEY=<gpg.key>
 DEBSIGN_MAINT="<name> <<email>>"

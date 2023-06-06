@@ -78,8 +78,6 @@ jobs:
           git checkout ${{ github.event.inputs.branch }}
       - name: Build Package
         run: |
-          mkdir build-area
-          mkdir tarballs
           sudo -H -u runner bash -c "cd project;  gbp buildpackage --git-builder='debuild -S -nc'"
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
