@@ -36,12 +36,6 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: ${{ github.event.inputs.package }}
-      - name: Sign Changes
-        run: |
-          sudo apt update
-          sudo apt install -y devscripts
-          FINGERPRINT=$(gpg --list-keys --with-colons --fingerprint | awk -F: '$1 == "fpr" {print $10;}' | awk 'NR==1{print $1}')
-          debsign -k $FINGERPRINT ./build-area/*.changes
       - name: Upload to Launchpad
         run: |
           dput my-ppa ./build-area/*source.changes
