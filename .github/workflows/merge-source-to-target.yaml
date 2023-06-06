@@ -1,0 +1,39 @@
+on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: 'Git Repo URL to clone'
+        required: true
+      target-branch:
+        description: 'Branch to merge into'
+        default: ubuntu/master
+      source:
+        description: 'Git source branch or tag to merge from'
+        default: debian/master
+  workflow_call:
+    inputs:
+      repo:
+        description: 'Git Repo URL to clone'
+        required: true
+      target-branch:
+        description: 'Branch to merge into'
+        default: ubuntu/master
+      source:
+        description: 'Branch to merge from'
+        default: debian/master
+
+jobs:
+  merge-source-to-target:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Clone Forked Repository
+        run: |
+          git clone ${{ github.event.inputs.repo }}
+      - name: Merge Source Into Target Branch
+        run: |
+          cd "$(basename ${{ github.event.inputs.repo }} .git)"
+          git checkout ${{ github.event.inputs.target-branch }}
+          git merge ${{ github.event.inputs.source }}
+          git push origin ${{ github.event.inputs.target-branch }}
