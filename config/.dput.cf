@@ -1,0 +1,6 @@
+[my-ppa]
+fqdn = ppa.launchpad.net
+method = ftp
+incoming = ~<your_launchpad_id>/ubuntu/<ppa_name>/
+login = anonymous
+allow_unsigned_uploads = 0

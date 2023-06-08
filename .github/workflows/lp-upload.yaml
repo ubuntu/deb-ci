@@ -1,0 +1,43 @@
+name: Launchpad Upload
+on:
+  workflow_call:
+    inputs:
+      ppa:
+        type: string
+        description: PPA of the LP user to upload package
+        default: ppa
+
+jobs:
+  launchpad-upload:
+    name: LP Upload
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Configure Dput
+        run: |
+          cp config/.dput.cf ~/
+          sed -i "s/<your_launchpad_id>/${{ secrets.LP_USER }}/g" ~/.dput.cf
+          sed -i "s/<ppa_name>/${{ inputs.ppa }}/g" ~/.dput.cf
+      - name: Import Keys
+        run: |
+          sudo apt update
+          sudo apt install -y ca-certificates
+          echo "${{ secrets.GPG_PUB_KEY }}" > pub.key
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" > private.key
+          gpg --import pub.key
+          gpg --import private.key
+          rm *.key
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts 
+      - name: Upload to Launchpad
+        run: |
+          dput my-ppa ./build-area/*source.changes
+      - name: Clean Up
+        if: always()
+        run: |
+          gpg --delete-secret-keys runner
+          gpg --delete-keys runner
