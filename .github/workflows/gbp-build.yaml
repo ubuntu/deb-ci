@@ -1,0 +1,98 @@
+name: GBP Build
+on:
+  workflow_call:
+    inputs:
+      repo:
+        type: string
+        required: true
+        description: Repository to build
+      branch:
+        type: string
+        description: Git branch to build
+        default: debian/master
+      series:
+        type: string
+        description: Build series
+        default: jammy
+  workflow_dispatch:
+    inputs:
+      repo:
+        type: string
+        required: true
+        description: Repository to build
+      branch:
+        type: string
+        description: Git branch to build
+        default: debian/master
+      series:
+        type: string
+        description: Build series
+        default: jammy
+
+jobs:
+  gbp-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git-buildpackage ubuntu-dev-tools sbuild-launchpad-chroot gnome-pkg-tools
+      - name: Configure Chroot
+        run: |
+          sudo sbuild-launchpad-chroot create -n ${{ inputs.series }} -s ${{ inputs.series }} -a amd64
+          # echo 'command-prefix=eatmydata' | sudo tee -a /etc/schroot/chroot.d/${{ inputs.series }}
+          # sudo schroot -c source:${{ inputs.series }} sudo apt update; sudo apt install debhelper eatmydata
+      - name: Configure GBP
+        run: |
+          cp config/.gbp.conf ~/
+          sed -i "s/${{ inputs.series }}>/${{ inputs.series }}/g" ~/.gbp.conf
+      - name: Configure SBuild
+        run: |
+          sudo sbuild-adduser runner
+          cp config/.sbuildrc ~/
+          sed -i "s/${{ inputs.series }}>/${{ inputs.series }}/g" ~/.sbuildrc
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PUB_KEY }}" > ~/.ssh/id_rsa.pub
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 400 ~/.ssh/id_rsa
+      - name: Import GPG Keys
+        run: |
+          sudo apt update
+          sudo apt install -y ca-certificates
+          echo "${{ secrets.GPG_PUB_KEY }}" > pub.key
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" > private.key
+          gpg --import pub.key
+          gpg --import private.key
+          rm *.key
+      - name: Configure Devscripts
+        run: |
+          FINGERPRINT=$(gpg --list-keys --with-colons --fingerprint | awk -F: '$1 == "fpr" {print $10;}' | awk 'NR==1{print $1}')
+          cp config/.devscripts ~/
+          sed -i "s/<gpg.key>/$FINGERPRINT/g" ~/.devscripts
+          sed -i "s/<name>/${{ secrets.LP_USER }}/g" ~/.devscripts
+          sed -i "s/<email>/${{ secrets.LP_EMAIL }}/g" ~/.devscripts
+      - name: Clone Repository
+        run: |
+          git clone ${{ inputs.repo }} project
+          cd project
+          git checkout pristine-tar
+          git checkout ${{ inputs.branch }}
+      - name: Build Package
+        run: |
+          sudo -H -u runner bash -c "cd project;  gbp buildpackage --git-builder='debuild -S -nc'"
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: |
+            ~/work/deb-ci/deb-ci/build-area/*
+            ~/work/deb-ci/deb-ci/tarballs/*
+      - name: Clean Up
+        if: always()
+        run: |
+          rm -rf ~/.ssh
+          rm -rf ~/.gnupg
