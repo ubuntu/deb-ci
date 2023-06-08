@@ -1,0 +1,95 @@
+name: GBP Pull Upstream
+on:
+  workflow_call:
+    inputs:
+      repo:
+        type: string
+        description: Downstream repository to clone
+        required: true
+  workflow_dispatch:
+    inputs:
+      repo:
+        type: string
+        description: Downstream repository to clone
+        required: true
+
+env:
+  DEBEMAIL: ${{ secrets.LP_EMAIL }}
+
+jobs:
+  gbp-pull-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git git-buildpackage
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PUB_KEY }}" > ~/.ssh/id_rsa.pub
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 400 ~/.ssh/id_rsa
+      - name: Import GPG Keys
+        run: |
+          sudo apt update
+          sudo apt install -y ca-certificates
+          echo "${{ secrets.GPG_PUB_KEY }}" > pub.key
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" > private.key
+          gpg --import pub.key
+          gpg --import private.key
+          rm *.key
+      - name: Configure Devscripts
+        run: |
+          FINGERPRINT=$(gpg --list-keys --with-colons --fingerprint | awk -F: '$1 == "fpr" {print $10;}' | awk 'NR==1{print $1}')
+          cp config/.devscripts ~/
+          sed -i "s/<gpg.key>/$FINGERPRINT/g" ~/.devscripts
+          sed -i "s/<name>/${{ secrets.LP_USER }}/g" ~/.devscripts
+          sed -i "s/<email>/${{ secrets.LP_EMAIL }}/g" ~/.devscripts
+      - name: Clone Repository
+        run: |
+          git clone ${{ inputs.repo }} project
+          cd project
+          git remote add upstreamvcs $(grep -r Repository: debian/upstream/metadata | cut -c 13-)
+          git fetch --all
+          git config user.email ${{ secrets.LP_EMAIL }}
+          git config user.name "${{ secrets.LP_USER }}"
+      - name: Checkout Branches
+        run: |
+          cd project
+          git checkout --track origin/pristine-tar
+          git checkout --track origin/upstream/latest
+          git checkout debian/master          
+      - name: Update Changelog and Rebase Patches
+        run: |
+          cd project
+          gbp pq import
+          gbp pq export
+          git add debian
+          git commit -m "Rebase patches" || true
+          gbp dch
+          git add debian
+          git commit -m "Update changelog" || true
+      - name: Import Upstream
+        run: |
+          cd project
+          gbp import-orig --uscan --no-interactive
+      - name: Push Branches
+        run: |
+          cd project
+          gbp push
+          git push origin debian/master
+      - name: Clean Up
+        if: always()
+        run: |
+          rm -rf ~/.ssh
+          rm -rf ~/.gnugp
+  gbp-build:
+    uses: ./.github/workflows/gbp-build.yaml
+    needs: [gbp-pull-upstream]
+    with:
+      repo: ${{ inputs.repo }}
+      branch: debian/master
+      series: mantic
