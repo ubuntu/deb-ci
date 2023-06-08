@@ -5,10 +5,6 @@ on:
         type: string
         description: PPA of the LP user to upload package
         default: ppa
-      package:
-        type: string
-        description: Name of package to be uploaded
-        required: true
 
 jobs:
   launchpad-upload:
@@ -35,7 +31,7 @@ jobs:
           rm *.key
       - uses: actions/download-artifact@v3
         with:
-          name: ${{ github.event.inputs.package }}
+          name: build-artifacts 
       - name: Upload to Launchpad
         run: |
           dput my-ppa ./build-area/*source.changes
