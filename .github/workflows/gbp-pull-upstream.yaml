@@ -27,6 +27,10 @@ jobs:
           git fetch --all
           git config user.email ${{ secrets.LP_EMAIL }}
           git config user.name "${{ secrets.LP_USER }}"
+      - name: Configure SSH
+        run: |
+          echo "${{ secrets.SSH_PUB_KEY }}" > .ssh/id_rsa.pub
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > .ssh/id_rsa
       - name: Checkout Branches
         run: |
           cd project
