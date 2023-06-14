@@ -1,0 +1,38 @@
+name: Friday Demo
+on:
+  workflow_dispatch:
+
+jobs:
+  test-upstream:
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+          - git@salsa.debian.org:jardon/gnome-maps.git
+          - git@salsa.debian.org:jardon/gnome-user-docs.git
+          - git@salsa.debian.org:jardon/nautilus.git
+    uses: ./.github/workflows/gbp-pull-upstream.yaml
+    secrets: inherit
+    with:
+      repo: ${{ matrix.repo }}
+  test-merge:
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+          - address: git@salsa.debian.org:jardon/deja-dup.git
+            source: debian/master
+            target: ubuntu/master
+          - address: git@salsa.debian.org:jardon/evolution.git
+            source: debian/master
+            target: ubuntu/mantic
+          - address: git@salsa.debian.org:jardon/gnome-shell.git
+            source: debian/master
+            target: ubuntu/master
+    uses: ./.github/workflows/gbp-merge-and-lp-upload.yaml
+    secrets: inherit
+    with:
+      repo: ${{ matrix.repo.address }}
+      source: ${{ matrix.repo.source }}
+      target-branch: ${{ matrix.repo.target }}
+

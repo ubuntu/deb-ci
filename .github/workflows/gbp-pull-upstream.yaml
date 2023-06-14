@@ -76,11 +76,11 @@ jobs:
         run: |
           cd project
           gbp import-orig --uscan --no-interactive
-      - name: Push Branches
-        run: |
-          cd project
-          gbp push
-          git push origin debian/master
+      # - name: Push Branches
+      #   run: |
+      #     cd project
+      #     gbp push
+      #     git push origin debian/master
       - name: Clean Up
         if: always()
         run: |

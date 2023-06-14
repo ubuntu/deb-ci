@@ -68,8 +68,8 @@ jobs:
           gbp dch
           git add debian
           git commit -m "Rebase patches" || true
-      - name: Push Branch
-        run: git push origin ${{ inputs.target-branch }}
+      # - name: Push Branch
+      #   run: git push origin ${{ inputs.target-branch }}
       - name: Clean Up
         if: always()
         run: |

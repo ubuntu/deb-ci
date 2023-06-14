@@ -14,6 +14,20 @@ on:
       repo:
         type: string
         required: true
+  workflow_call:
+    inputs:
+      target-branch:
+        type: string
+        default: ubuntu/master
+      source:
+        type: string
+        default: debian/master
+      series:
+        type: string
+        default: jammy
+      repo:
+        type: string
+        required: true
 
 jobs:
   gbp-merge:
