@@ -1,0 +1,77 @@
+name: GBP Merge
+on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: 'Git Repo URL to clone'
+        type: string
+        required: true
+      target-branch:
+        description: 'Branch to merge into'
+        type: string
+        default: ubuntu/master
+      source:
+        description: 'Git source branch or tag to merge from'
+        type: string
+        default: debian/master
+  workflow_call:
+    inputs:
+      repo:
+        description: 'Git Repo URL to clone'
+        type: string
+        required: true
+      target-branch:
+        description: 'Branch to merge into'
+        type: string
+        default: ubuntu/master
+      source:
+        description: 'Branch to merge from'
+        type: string
+        default: debian/master
+
+env:
+  DEBEMAIL: ${{ secrets.LP_EMAIL }}
+
+jobs:
+  merge-source-to-target:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git git-buildpackage
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PUB_KEY }}" > ~/.ssh/id_rsa.pub
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 400 ~/.ssh/id_rsa
+      - name: Clone Repository
+        run: |
+          git clone ${{ inputs.repo }} project
+          cd project
+          git config user.email ${{ secrets.LP_EMAIL }}
+          git config user.name "${{ secrets.LP_USER }}"
+      - name: Merge Source Into Target Branch
+        run: |
+          cd project
+          git checkout ${{ inputs.target-branch }}
+          git merge ${{ inputs.source }}
+      - name: Rebase Patches
+        run: |
+          cd project
+          gbp pq import
+          gbp pq export
+          gbp dch
+          git add debian
+          git commit -m "Rebase patches" || true
+      - name: Push Branch
+        run: git push origin ${{ inputs.target-branch }}
+      - name: Clean Up
+        if: always()
+        run: |
+          rm -rf ~/.ssh
+      
