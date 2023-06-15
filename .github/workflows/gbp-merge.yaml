@@ -73,8 +73,10 @@ jobs:
           gbp dch
           git add debian
           git commit -m "Rebase patches" || true
-      # - name: Push Branch
-      #   run: git push origin ${{ inputs.target-branch }}
+      - name: Push Branch
+        run: |
+          cd project
+          git push origin ${{ inputs.target-branch }}
       - name: Parse Project Name
         if: failure()
         id: parse-project-name

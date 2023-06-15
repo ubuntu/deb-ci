@@ -14,6 +14,7 @@ jobs:
     secrets: inherit
     with:
       repo: ${{ matrix.repo }}
+
   test-build:
     strategy:
       fail-fast: false
@@ -28,6 +29,7 @@ jobs:
       repo: ${{ matrix.repo.address }}
       branch: ${{ matrix.repo.branch }}
       series: ${{ matrix.repo.series }}
+
   test-lp-upload:
     strategy:
       fail-fast: false
@@ -42,6 +44,7 @@ jobs:
       repo: ${{ matrix.repo.address }}
       branch: ${{ matrix.repo.branch }}
       series: ${{ matrix.repo.series }}
+
   test-merge:
     strategy:
       fail-fast: false
