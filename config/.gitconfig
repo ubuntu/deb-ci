@@ -1,0 +1,3 @@
+[merge "merge-changelog"]
+     name = GNU-style ChangeLog merge driver
+     driver = /usr/bin/git-merge-changelog %O %A %B
