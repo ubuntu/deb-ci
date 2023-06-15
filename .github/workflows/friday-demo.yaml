@@ -9,7 +9,7 @@ jobs:
       matrix:
         repo:
           - git@salsa.debian.org:jardon/gnome-maps.git
-          - git@salsa.debian.org:jardon/gnome-user-docs.git
+          # - git@salsa.debian.org:jardon/gnome-user-docs.git
           - git@salsa.debian.org:jardon/nautilus.git
     uses: ./.github/workflows/gbp-pull-upstream.yaml
     secrets: inherit
