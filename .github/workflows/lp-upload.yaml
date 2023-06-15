@@ -54,6 +54,10 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y dput
       - name: Configure Dput
         run: |
           cp config/.dput.cf ~/
@@ -80,5 +84,4 @@ jobs:
       - name: Clean Up
         if: always()
         run: |
-          gpg --delete-secret-keys runner
-          gpg --delete-keys runner
+          rm -rf ~/.gnupg
