@@ -50,4 +50,5 @@ jobs:
     needs: [gbp-build]
     secrets: inherit
     with:
+      repo: ${{ inputs.repo }}
       ppa: testing

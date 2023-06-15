@@ -84,10 +84,13 @@ jobs:
       - name: Build Package
         run: |
           sudo -H -u runner bash -c "cd project;  gbp buildpackage --git-builder='debuild -S -nc'"
+      - name: Parse Project Name
+        id: parse-project-name
+        run: echo "name=$(basename ${{ inputs.repo }} .git)" >> $GITHUB_OUTPUT
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: build-artifacts
+          name: ${{ steps.parse-project-name.outputs.name }}
           path: |
             ~/work/deb-ci/deb-ci/build-area/*
             ~/work/deb-ci/deb-ci/tarballs/*

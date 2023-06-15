@@ -2,6 +2,10 @@ name: Launchpad Upload
 on:
   workflow_call:
     inputs:
+      repo:
+        type: string
+        required: true
+        description: Repo address to derive basename from
       ppa:
         type: string
         description: PPA of the LP user to upload package
@@ -30,9 +34,12 @@ jobs:
           gpg --import pub.key
           gpg --import private.key
           rm *.key
+      - name: Parse Project Name
+        id: parse-project-name
+        run: echo "name=$(basename ${{ inputs.repo }} .git)" >> $GITHUB_OUTPUT
       - uses: actions/download-artifact@v3
         with:
-          name: build-artifacts 
+          name: ${{ steps.parse-project-name.outputs.name }}
       - name: Upload to Launchpad
         run: |
           dput my-ppa ./build-area/*source.changes
