@@ -89,6 +89,7 @@ jobs:
   gbp-build:
     uses: ./.github/workflows/gbp-build.yaml
     needs: [gbp-pull-upstream]
+    secrets: inherit
     with:
       repo: ${{ inputs.repo }}
       branch: debian/master
