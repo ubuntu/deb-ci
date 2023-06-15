@@ -37,18 +37,12 @@ jobs:
       repo: ${{ inputs.repo }}
       target-branch: ${{ inputs.target-branch }}
       source: ${{ inputs.source }}
-  gbp-build:
-    uses: ./.github/workflows/gbp-build.yaml
+  lp-upload:
+    uses: ./.github/workflows/lp-upload.yaml
     needs: [gbp-merge]
     secrets: inherit
     with:
       repo: ${{ inputs.repo }}
       branch: ${{ inputs.target-branch }}
       series: ${{ inputs.series }}
-  lp-upload:
-    uses: ./.github/workflows/lp-upload.yaml
-    needs: [gbp-build]
-    secrets: inherit
-    with:
-      repo: ${{ inputs.repo }}
       ppa: testing

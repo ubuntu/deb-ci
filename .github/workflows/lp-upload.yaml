@@ -5,15 +5,49 @@ on:
       repo:
         type: string
         required: true
-        description: Repo address to derive basename from
+        description: Repository to build
+      branch:
+        type: string
+        description: Git branch to build
+        default: debian/master
+      series:
+        type: string
+        description: Build series
+        default: jammy
+      ppa:
+        type: string
+        description: PPA of the LP user to upload package
+        default: ppa
+  workflow_dispatch:
+    inputs:
+      repo:
+        type: string
+        required: true
+        description: Repository to build
+      branch:
+        type: string
+        description: Git branch to build
+        default: debian/master
+      series:
+        type: string
+        description: Build series
+        default: jammy
       ppa:
         type: string
         description: PPA of the LP user to upload package
         default: ppa
 
 jobs:
+  gbp-build:
+    uses: ./.github/workflows/gbp-build.yaml
+    secrets: inherit
+    with:
+      repo: ${{ inputs.repo }}
+      branch: ${{ inputs. branch }}
+      series: ${{ inputs.series }}
   launchpad-upload:
     name: LP Upload
+    needs: [gbp-build]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
