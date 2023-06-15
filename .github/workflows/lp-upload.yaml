@@ -81,6 +81,16 @@ jobs:
       - name: Upload to Launchpad
         run: |
           dput my-ppa ./build-area/*source.changes
+      - name: Create Issue
+        if: failure()
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WORKFLOW_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          ISSUE_TITLE: "LP Upload Failure: ${{ inputs.series }}/${{ steps.parse-project-name.outputs.name }}"
+        with:
+          update_existing: true
+          search_existing: open
       - name: Clean Up
         if: always()
         run: |

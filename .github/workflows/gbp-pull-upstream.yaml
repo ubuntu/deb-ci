@@ -81,6 +81,20 @@ jobs:
       #     cd project
       #     gbp push
       #     git push origin debian/master
+      - name: Parse Project Name
+        if: failure()
+        id: parse-project-name
+        run: echo "name=$(basename ${{ inputs.repo }} .git)" >> $GITHUB_OUTPUT
+      - name: Create Issue
+        if: failure()
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WORKFLOW_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          ISSUE_TITLE: "GBP Pull Upstream Failure: ${{ steps.parse-project-name.outputs.name }}"
+        with:
+          update_existing: true
+          search_existing: open
       - name: Clean Up
         if: always()
         run: |
