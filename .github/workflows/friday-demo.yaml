@@ -9,12 +9,39 @@ jobs:
       matrix:
         repo:
           - git@salsa.debian.org:jardon/gnome-maps.git
-          # - git@salsa.debian.org:jardon/gnome-user-docs.git
           - git@salsa.debian.org:jardon/nautilus.git
     uses: ./.github/workflows/gbp-pull-upstream.yaml
     secrets: inherit
     with:
       repo: ${{ matrix.repo }}
+  test-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+          - address: git@salsa.debian.org:jardon/gnome-user-docs.git
+            branch: ubuntu/jammy
+            series: jammy
+    uses: ./.github/workflows/gbp-build.yaml
+    secrets: inherit
+    with:
+      repo: ${{ matrix.repo.address }}
+      branch: ${{ matrix.repo.branch }}
+      series: ${{ matrix.repo.series }}
+  test-lp-upload:
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+          - address: git@salsa.debian.org:jardon/gnome-shell.git
+            branch: ubuntu/kinetic
+            series: kinetic
+    uses: ./.github/workflows/lp-upload.yaml
+    secrets: inherit
+    with:
+      repo: ${{ matrix.repo.address }}
+      branch: ${{ matrix.repo.branch }}
+      series: ${{ matrix.repo.series }}
   test-merge:
     strategy:
       fail-fast: false
@@ -23,16 +50,15 @@ jobs:
           - address: git@salsa.debian.org:jardon/deja-dup.git
             source: debian/master
             target: ubuntu/master
+            series: mantic
           - address: git@salsa.debian.org:jardon/evolution.git
             source: debian/master
             target: ubuntu/mantic
-          - address: git@salsa.debian.org:jardon/gnome-shell.git
-            source: debian/master
-            target: ubuntu/master
+            series: mantic
     uses: ./.github/workflows/gbp-merge-and-lp-upload.yaml
     secrets: inherit
     with:
       repo: ${{ matrix.repo.address }}
       source: ${{ matrix.repo.source }}
       target-branch: ${{ matrix.repo.target }}
-
+      series: ${{ matrix.repo.series }}
