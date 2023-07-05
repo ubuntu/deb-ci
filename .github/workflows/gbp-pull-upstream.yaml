@@ -48,6 +48,7 @@ jobs:
           sed -i "s/<gpg.key>/$FINGERPRINT/g" ~/.devscripts
           sed -i "s/<name>/${{ secrets.LP_USER }}/g" ~/.devscripts
           sed -i "s/<email>/${{ secrets.LP_EMAIL }}/g" ~/.devscripts
+          echo 'DEBCHANGE_VENDOR=debian' | tee -a ~/.devscripts
       - name: Clone Repository
         run: |
           git clone ${{ inputs.repo }} project
