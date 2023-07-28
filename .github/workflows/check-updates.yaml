@@ -8,7 +8,11 @@ jobs:
     strategy:
       matrix:
         repo:
-          - git@salsa.debian.org:jardon/gnome-boxes.git
+          - git@salsa.debian.org:${{ LP_USER }}/epiphany-browser.git
+          - git@salsa.debian.org:${{ LP_USER }}/gnome-software.git
+          - git@salsa.debian.org:${{ LP_USER }}/gedit.git
+          - git@salsa.debian.org:${{ LP_USER }}/gedit-plugins.git
+          - git@salsa.debian.org:${{ LP_USER }}/glib.git
     runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
@@ -39,5 +43,5 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"\
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/jardon/deb-ci/actions/workflows/59636522/dispatches \
+            https://api.github.com/repos/ubuntu/deb-ci/actions/workflows/59636522/dispatches \
             -d '{"ref":"main","inputs":{"repo":"${{ matrix.repo }}"}}'
