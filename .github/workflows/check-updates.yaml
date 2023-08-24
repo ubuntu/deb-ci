@@ -13,6 +13,11 @@ jobs:
           - git@salsa.debian.org:ubuntu-desktop-helper/gedit.git
           - git@salsa.debian.org:ubuntu-desktop-helper/gedit-plugins.git
           - git@salsa.debian.org:ubuntu-desktop-helper/glib.git
+          - git@salsa.debian.org:ubuntu-desktop-helper/geary.git
+          - git@salsa.debian.org:ubuntu-desktop-helper/gnome-calculator.git
+          - git@salsa.debian.org:ubuntu-desktop-helper/gnome-system-monitor.git
+          - git@salsa.debian.org:ubuntu-desktop-helper/orca.git
+          - git@salsa.debian.org:ubuntu-desktop-helper/gnome-flashback.git
     runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
