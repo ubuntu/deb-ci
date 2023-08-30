@@ -93,6 +93,15 @@ jobs:
         with:
           update_existing: true
           search_existing: open
+      - name: Create the Mattermost Message
+        if: failure()
+        run: |
+          MESSAGE="GBP Pull Failure: ${{ steps.parse-project-name.outputs.name }}\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo "{\"text\":\"$MESSAGE  \"}" > mattermost.json
+      - uses: mattermost/action-mattermost-notify@master
+        if: failure()
+        env:
+          MATTERMOST_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK }}
       - name: Clean Up
         if: always()
         run: |
@@ -106,3 +115,17 @@ jobs:
       repo: ${{ inputs.repo }}
       branch: debian/master
       series: mantic
+  mm-notify:
+    runs-on: ubuntu-latest
+    needs: [gbp-build]
+    steps:
+    - name: Parse Project Name
+        id: parse-project-name
+        run: echo "name=$(basename ${{ inputs.repo }} .git)" >> $GITHUB_OUTPUT
+    - name: Create the Mattermost Message
+      run: |
+        MESSAGE="New release for ${{ steps.parse-project-name.outputs.name }} has been built and is ready for review."
+        echo "{\"text\":\"$MESSAGE  \"}" > mattermost.json
+    - uses: mattermost/action-mattermost-notify@master
+      env:
+        MATTERMOST_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK }}
