@@ -119,13 +119,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: [gbp-build]
     steps:
-    - name: Parse Project Name
+      - name: Parse Project Name
         id: parse-project-name
         run: echo "name=$(basename ${{ inputs.repo }} .git)" >> $GITHUB_OUTPUT
-    - name: Create the Mattermost Message
-      run: |
-        MESSAGE="New release for ${{ steps.parse-project-name.outputs.name }} has been built and is ready for review."
-        echo "{\"text\":\"$MESSAGE  \"}" > mattermost.json
-    - uses: mattermost/action-mattermost-notify@master
-      env:
-        MATTERMOST_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK }}
+      - name: Create the Mattermost Message
+        run: |
+          MESSAGE="New release for ${{ steps.parse-project-name.outputs.name }} has been built and is ready for review."
+          echo "{\"text\":\"$MESSAGE  \"}" > mattermost.json
+      - uses: mattermost/action-mattermost-notify@master
+        env:
+          MATTERMOST_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK }}
