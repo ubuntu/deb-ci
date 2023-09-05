@@ -46,7 +46,7 @@ jobs:
       - name: Configure GBP
         run: |
           cp config/.gbp.conf ~/
-          sed -i "s/${{ inputs.series }}>/${{ inputs.series }}/g" ~/.gbp.conf
+          sed -i "s/<codename>/${{ inputs.series }}/g" ~/.gbp.conf
       - name: Configure SBuild
         run: |
           sudo sbuild-adduser runner
