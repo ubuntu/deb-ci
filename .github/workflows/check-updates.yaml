@@ -19,6 +19,11 @@ jobs:
           - git@salsa.debian.org:ubuntu-desktop-helper/gnome-system-monitor.git
           - git@salsa.debian.org:ubuntu-desktop-helper/orca.git
           - git@salsa.debian.org:ubuntu-desktop-helper/gnome-flashback.git
+          - git@salsa.debian.org:ubuntu-desktop-helper/evince.git
+          - git@salsa.debian.org:ubuntu-desktop-helper/gnome-boxes.git
+          - git@salsa.debian.org:ubuntu-desktop-helper/gnome-remote-desktop.git
+          - git@salsa.debian.org:ubuntu-desktop-helper/gnome-backgrounds.git
+          - git@salsa.debian.org:ubuntu-desktop-helper/gnome-connections.git
     runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
