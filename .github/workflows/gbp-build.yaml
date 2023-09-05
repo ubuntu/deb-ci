@@ -83,7 +83,7 @@ jobs:
           git checkout ${{ inputs.branch }}
       - name: Build Package
         run: |
-          sudo -H -u runner bash -c "cd project;  gbp buildpackage --git-builder='debuild -S -nc'"
+          sudo -H -u runner bash -c "cd project;  gbp buildpackage"
       - name: Parse Project Name
         id: parse-project-name
         run: echo "name=$(basename ${{ inputs.repo }} .git)" >> $GITHUB_OUTPUT
