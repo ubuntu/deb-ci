@@ -13,7 +13,7 @@ jobs:
           - git@salsa.debian.org:ubuntu-desktop-helper/gnome-software.git
           - git@salsa.debian.org:ubuntu-desktop-helper/gedit.git
           - git@salsa.debian.org:ubuntu-desktop-helper/gedit-plugins.git
-          - git@salsa.debian.org:ubuntu-desktop-helper/glib.git
+            #- git@salsa.debian.org:ubuntu-desktop-helper/glib.git
           - git@salsa.debian.org:ubuntu-desktop-helper/geary.git
           - git@salsa.debian.org:ubuntu-desktop-helper/gnome-calculator.git
           - git@salsa.debian.org:ubuntu-desktop-helper/gnome-system-monitor.git
