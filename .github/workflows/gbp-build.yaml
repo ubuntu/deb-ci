@@ -9,7 +9,7 @@ on:
       branch:
         type: string
         description: Git branch to build
-        default: debian/master
+        default: debian/latest
       series:
         type: string
         description: Build series
@@ -23,7 +23,7 @@ on:
       branch:
         type: string
         description: Git branch to build
-        default: debian/master
+        default: debian/latest
       series:
         type: string
         description: Build series
