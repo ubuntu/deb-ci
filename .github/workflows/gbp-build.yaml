@@ -46,7 +46,7 @@ jobs:
       - name: Configure GBP
         run: |
           cp config/.gbp.conf ~/
-          sed -i "s/${{ inputs.series }}>/${{ inputs.series }}/g" ~/.gbp.conf
+          sed -i "s/<codename>/${{ inputs.series }}/g" ~/.gbp.conf
       - name: Configure SBuild
         run: |
           sudo sbuild-adduser runner
@@ -83,7 +83,7 @@ jobs:
           git checkout ${{ inputs.branch }}
       - name: Build Package
         run: |
-          sudo -H -u runner bash -c "cd project;  gbp buildpackage --git-builder='debuild -S -nc'"
+          sudo -H -u runner bash -c "cd project;  gbp buildpackage"
       - name: Parse Project Name
         id: parse-project-name
         run: echo "name=$(basename ${{ inputs.repo }} .git)" >> $GITHUB_OUTPUT
