@@ -9,11 +9,11 @@ on:
       target-branch:
         description: 'Branch to merge into'
         type: string
-        default: ubuntu/master
+        default: ubuntu/latest
       source:
         description: 'Git source branch or tag to merge from'
         type: string
-        default: debian/master
+        default: debian/latest
   workflow_call:
     inputs:
       repo:
@@ -23,11 +23,11 @@ on:
       target-branch:
         description: 'Branch to merge into'
         type: string
-        default: ubuntu/master
+        default: ubuntu/latest
       source:
         description: 'Branch to merge from'
         type: string
-        default: debian/master
+        default: debian/latest
 
 env:
   DEBEMAIL: ${{ secrets.LP_EMAIL }}

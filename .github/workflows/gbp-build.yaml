@@ -13,7 +13,7 @@ on:
       series:
         type: string
         description: Build series
-        default: jammy
+        default: mantic
   workflow_dispatch:
     inputs:
       repo:
@@ -27,7 +27,7 @@ on:
       series:
         type: string
         description: Build series
-        default: jammy
+        default: mantic
 
 jobs:
   gbp-build:
