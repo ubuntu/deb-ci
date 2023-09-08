@@ -4,13 +4,13 @@ on:
     inputs:
       target-branch:
         type: string
-        default: ubuntu/master
+        default: ubuntu/latest
       source:
         type: string
-        default: debian/master
+        default: debian/latest
       series:
         type: string
-        default: jammy
+        default: mantic
       repo:
         type: string
         required: true
@@ -18,13 +18,13 @@ on:
     inputs:
       target-branch:
         type: string
-        default: ubuntu/master
+        default: ubuntu/latest
       source:
         type: string
-        default: debian/master
+        default: debian/latest
       series:
         type: string
-        default: jammy
+        default: mantic
       repo:
         type: string
         required: true

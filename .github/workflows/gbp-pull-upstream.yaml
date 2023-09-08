@@ -62,7 +62,7 @@ jobs:
           cd project
           git checkout --track origin/pristine-tar
           git checkout --track origin/upstream/latest
-          git checkout debian/master          
+          git checkout debian/latest
       - name: Rebase Patches
         run: |
           cd project
@@ -78,7 +78,7 @@ jobs:
         run: |
           cd project
           gbp push
-          git push origin debian/master
+          git push origin debian/latest
       - name: Parse Project Name
         if: failure()
         id: parse-project-name
@@ -113,7 +113,7 @@ jobs:
     secrets: inherit
     with:
       repo: ${{ inputs.repo }}
-      branch: debian/master
+      branch: debian/latest
       series: mantic
   mm-notify:
     runs-on: ubuntu-latest
