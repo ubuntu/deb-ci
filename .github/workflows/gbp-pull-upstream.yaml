@@ -25,6 +25,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y git git-buildpackage
+      - name: Parse Project Name
+        id: parse-project-name
+        run: echo "name=$(basename ${{ inputs.repo }} .git)" >> $GITHUB_OUTPUT
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
@@ -54,6 +57,7 @@ jobs:
           git clone ${{ inputs.repo }} project
           cd project
           git remote add upstreamvcs $(grep -r Repository: debian/upstream/metadata | cut -c 13-)
+          git remote add salsa.bot git@salsa.debian.org:${{ secrets.LP_USER }}/${{ steps.parse-project-name.outputs.name }}.git
           git fetch --all
           git config user.email ${{ secrets.LP_EMAIL }}
           git config user.name "${{ secrets.LP_USER }}"
@@ -77,12 +81,10 @@ jobs:
       - name: Push Branches
         run: |
           cd project
-          gbp push
-          git push origin debian/latest
-      - name: Parse Project Name
-        if: failure()
-        id: parse-project-name
-        run: echo "name=$(basename ${{ inputs.repo }} .git)" >> $GITHUB_OUTPUT
+          git push salsa.bot upstream/latest --force
+          git push salsa.bot pristine-tar --force
+          git push salsa.bot debian/latest --force
+          git push salsa.bot --tags
       - name: Create Issue
         if: failure()
         uses: JasonEtco/create-an-issue@v2
@@ -107,12 +109,14 @@ jobs:
         run: |
           rm -rf ~/.ssh
           rm -rf ~/.gnugp
+    outputs:
+      project-name: ${{ steps.parse-project-name.outputs.name }}
   gbp-build:
     uses: ./.github/workflows/gbp-build.yaml
     needs: [gbp-pull-upstream]
     secrets: inherit
     with:
-      repo: ${{ inputs.repo }}
+      repo: git@salsa.debian.org:gnome-team/${{ needs.gbp-pull-upstream.outputs.project-name }}.git
       branch: debian/latest
       series: mantic
   mm-notify:

@@ -9,21 +9,21 @@ jobs:
     strategy:
       matrix:
         repo:
-          - git@salsa.debian.org:ubuntu-desktop-helper/epiphany-browser.git
-          - git@salsa.debian.org:ubuntu-desktop-helper/gnome-software.git
-          - git@salsa.debian.org:ubuntu-desktop-helper/gedit.git
-          - git@salsa.debian.org:ubuntu-desktop-helper/gedit-plugins.git
-            #- git@salsa.debian.org:ubuntu-desktop-helper/glib.git
-          - git@salsa.debian.org:ubuntu-desktop-helper/geary.git
-          - git@salsa.debian.org:ubuntu-desktop-helper/gnome-calculator.git
-          - git@salsa.debian.org:ubuntu-desktop-helper/gnome-system-monitor.git
-          - git@salsa.debian.org:ubuntu-desktop-helper/orca.git
-          - git@salsa.debian.org:ubuntu-desktop-helper/gnome-flashback.git
-          - git@salsa.debian.org:ubuntu-desktop-helper/evince.git
-          - git@salsa.debian.org:ubuntu-desktop-helper/gnome-boxes.git
-          - git@salsa.debian.org:ubuntu-desktop-helper/gnome-remote-desktop.git
-          - git@salsa.debian.org:ubuntu-desktop-helper/gnome-backgrounds.git
-          - git@salsa.debian.org:ubuntu-desktop-helper/gnome-connections.git
+          - git@salsa.debian.org:gnome-team/epiphany-browser.git
+          - git@salsa.debian.org:gnome-team/gnome-software.git
+          - git@salsa.debian.org:gnome-team/gedit.git
+          - git@salsa.debian.org:gnome-team/gedit-plugins.git
+            #- git@salsa.debian.org:gnome-team/glib.git
+          - git@salsa.debian.org:gnome-team/geary.git
+          - git@salsa.debian.org:gnome-team/gnome-calculator.git
+          - git@salsa.debian.org:gnome-team/gnome-system-monitor.git
+          - git@salsa.debian.org:gnome-team/orca.git
+          - git@salsa.debian.org:gnome-team/gnome-flashback.git
+          - git@salsa.debian.org:gnome-team/evince.git
+          - git@salsa.debian.org:gnome-team/gnome-boxes.git
+          - git@salsa.debian.org:gnome-team/gnome-remote-desktop.git
+          - git@salsa.debian.org:gnome-team/gnome-backgrounds.git
+          - git@salsa.debian.org:gnome-team/gnome-connections.git
     runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
