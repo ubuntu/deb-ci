@@ -6,12 +6,20 @@ on:
         type: string
         description: Downstream repository to clone
         required: true
+      branch:
+        type: string
+        description: Branch for gbp to import into
+        default: debian/latest
   workflow_dispatch:
     inputs:
       repo:
         type: string
         description: Downstream repository to clone
         required: true
+      branch:
+        type: string
+        description: Branch for gbp to import into
+        default: debian/latest
 
 env:
   DEBEMAIL: ${{ secrets.LP_EMAIL }}
@@ -66,7 +74,7 @@ jobs:
           cd project
           git checkout --track origin/pristine-tar
           git checkout --track origin/upstream/latest
-          git checkout debian/latest
+          git checkout ${{ inputs.branch }}
       - name: Rebase Patches
         run: |
           cd project
@@ -83,7 +91,7 @@ jobs:
           cd project
           git push salsa.bot upstream/latest --force
           git push salsa.bot pristine-tar --force
-          git push salsa.bot debian/latest --force
+          git push salsa.bot ${{ inputs.branch }} --force
           git push salsa.bot --tags
       - name: Create Issue
         if: failure()
@@ -117,7 +125,7 @@ jobs:
     secrets: inherit
     with:
       repo: git@salsa.debian.org:gnome-team/${{ needs.gbp-pull-upstream.outputs.project-name }}.git
-      branch: debian/latest
+      branch: ${{ inputs.branch }}
       series: mantic
   mm-notify:
     runs-on: ubuntu-latest
