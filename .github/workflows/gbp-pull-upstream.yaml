@@ -65,6 +65,7 @@ jobs:
           git clone ${{ inputs.repo }} project
           cd project
           git remote add upstreamvcs $(grep -r Repository: debian/upstream/metadata | cut -c 13-)
+          git remote add salsa.gnome git@salsa.debian.org:gnome-team/${{ steps.parse-project-name.outputs.name }}.git
           git fetch --all
           git config user.email ${{ secrets.LP_EMAIL }}
           git config user.name "${{ secrets.LP_USER }}"
@@ -72,8 +73,11 @@ jobs:
         run: |
           cd project
           git checkout --track origin/pristine-tar
+          git rebase salsa.gnome/pristine-tar
           git checkout --track origin/upstream/latest
+          git rebase salsa.gnome/upsteam/latest
           git checkout ${{ inputs.branch }}
+          git rebase salsa.gnome/${{ inputs.branch }}
       - name: Rebase Patches
         run: |
           cd project
@@ -89,10 +93,6 @@ jobs:
         id: push-to-remote
         run: |
           cd project
-          REMOTE=git@salsa.debian.org:${{ secrets.LP_USER }}/${{ steps.parse-project-name.outputs.name }}.git
-          echo "repo=$REMOTE" >> $GITHUB_OUTPUT
-          git remote add salsa.bot $REMOTE
-          git fetch --all
           git push salsa.bot upstream/latest --force
           git push salsa.bot pristine-tar --force
           git push salsa.bot ${{ inputs.branch }} --force
@@ -121,14 +121,12 @@ jobs:
         run: |
           rm -rf ~/.ssh
           rm -rf ~/.gnugp
-    outputs:
-      remote: ${{ steps.push-to-remote.outputs.repo }}
   gbp-build:
     uses: ./.github/workflows/gbp-build.yaml
     needs: [gbp-pull-upstream]
     secrets: inherit
     with:
-      repo: ${{ needs.gbp-pull-upstream.outputs.remote }}
+      repo: ${{ inputs.repo }}
       branch: ${{ inputs.branch }}
       series: mantic
   mm-notify:
