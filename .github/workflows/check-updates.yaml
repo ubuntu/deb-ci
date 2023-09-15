@@ -18,7 +18,7 @@ jobs:
           - url: git@salsa.debian.org:gnome-team/gnome-calculator.git
           - url: git@salsa.debian.org:gnome-team/gnome-system-monitor.git
           - url: git@salsa.debian.org:gnome-team/orca.git
-            branch: debian/experimental
+            branch: debian/sid
           - url: git@salsa.debian.org:gnome-team/gnome-flashback.git
           - url: git@salsa.debian.org:gnome-team/evince.git
           - url: git@salsa.debian.org:gnome-team/gnome-boxes.git
