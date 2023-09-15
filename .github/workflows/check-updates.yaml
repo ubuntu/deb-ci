@@ -9,21 +9,22 @@ jobs:
     strategy:
       matrix:
         repo:
-          - git@salsa.debian.org:gnome-team/epiphany-browser.git
-          - git@salsa.debian.org:gnome-team/gnome-software.git
-          - git@salsa.debian.org:gnome-team/gedit.git
-          - git@salsa.debian.org:gnome-team/gedit-plugins.git
-            #- git@salsa.debian.org:gnome-team/glib.git
-          - git@salsa.debian.org:gnome-team/geary.git
-          - git@salsa.debian.org:gnome-team/gnome-calculator.git
-          - git@salsa.debian.org:gnome-team/gnome-system-monitor.git
-          - git@salsa.debian.org:gnome-team/orca.git
-          - git@salsa.debian.org:gnome-team/gnome-flashback.git
-          - git@salsa.debian.org:gnome-team/evince.git
-          - git@salsa.debian.org:gnome-team/gnome-boxes.git
-          - git@salsa.debian.org:gnome-team/gnome-remote-desktop.git
-          - git@salsa.debian.org:gnome-team/gnome-backgrounds.git
-          - git@salsa.debian.org:gnome-team/gnome-connections.git
+          - url: git@salsa.debian.org:gnome-team/epiphany-browser.git
+          - url: git@salsa.debian.org:gnome-team/gnome-software.git
+          - url: git@salsa.debian.org:gnome-team/gedit.git
+          - url: git@salsa.debian.org:gnome-team/gedit-plugins.git
+            #- url: git@salsa.debian.org:gnome-team/glib.git
+          - url: git@salsa.debian.org:gnome-team/geary.git
+          - url: git@salsa.debian.org:gnome-team/gnome-calculator.git
+          - url: git@salsa.debian.org:gnome-team/gnome-system-monitor.git
+          - url: git@salsa.debian.org:gnome-team/orca.git
+            branch: debian/sid
+          - url: git@salsa.debian.org:gnome-team/gnome-flashback.git
+          - url: git@salsa.debian.org:gnome-team/evince.git
+          - url: git@salsa.debian.org:gnome-team/gnome-boxes.git
+          - url: git@salsa.debian.org:gnome-team/gnome-remote-desktop.git
+          - url: git@salsa.debian.org:gnome-team/gnome-backgrounds.git
+          - url: git@salsa.debian.org:gnome-team/gnome-connections.git
     runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
@@ -39,7 +40,7 @@ jobs:
           chmod 400 ~/.ssh/id_rsa
       - name: Clone repo
         run: |
-          git clone ${{ matrix.repo }} project
+          git clone ${{ matrix.repo.url }} project
       - name: Check for Update
         id: check-update
         continue-on-error: true
@@ -49,10 +50,16 @@ jobs:
       - name: Create job
         if: steps.check-update.outputs.release == 'available'
         run: |
+          BRANCH=${{ matrix.repo.branch }}
+          if [[ -z "$BRANCH" ]]; then
+              BRANCH_JSON=""
+          else
+              BRANCH_JSON="'branch':'$BRANCH'"
+          fi
           curl -L \
             -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"\
             -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/ubuntu/deb-ci/actions/workflows/59636522/dispatches \
-            -d '{"ref":"main","inputs":{"repo":"${{ matrix.repo }}"}}'
+            -d '{"ref":"main","inputs":{"repo":"${{ matrix.repo.url }}",$BRANCH_JSON}}'
