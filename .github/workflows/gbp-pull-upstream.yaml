@@ -93,10 +93,10 @@ jobs:
         id: push-to-remote
         run: |
           cd project
-          git push salsa.bot upstream/latest --force
-          git push salsa.bot pristine-tar --force
-          git push salsa.bot ${{ inputs.branch }} --force
-          git push salsa.bot --tags --force
+          git push origin upstream/latest --force
+          git push origin pristine-tar --force
+          git push origin ${{ inputs.branch }} --force
+          git push origin --tags --force
       - name: Create Issue
         if: failure()
         uses: JasonEtco/create-an-issue@v2
