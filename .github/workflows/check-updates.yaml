@@ -9,22 +9,22 @@ jobs:
     strategy:
       matrix:
         repo:
-          - url: git@salsa.debian.org:gnome-team/epiphany-browser.git
-          - url: git@salsa.debian.org:gnome-team/gnome-software.git
-          - url: git@salsa.debian.org:gnome-team/gedit.git
-          - url: git@salsa.debian.org:gnome-team/gedit-plugins.git
-            #- url: git@salsa.debian.org:gnome-team/glib.git
-          - url: git@salsa.debian.org:gnome-team/geary.git
-          - url: git@salsa.debian.org:gnome-team/gnome-calculator.git
-          - url: git@salsa.debian.org:gnome-team/gnome-system-monitor.git
-          - url: git@salsa.debian.org:gnome-team/orca.git
+          - url: git@salsa.debian.org:ubuntu-desktop-helper/epiphany-browser.git
+          - url: git@salsa.debian.org:ubuntu-desktop-helper/gnome-software.git
+          - url: git@salsa.debian.org:ubuntu-desktop-helper/gedit.git
+          - url: git@salsa.debian.org:ubuntu-desktop-helper/gedit-plugins.git
+            #- url: git@salsa.debian.org:ubuntu-desktop-helper/glib.git
+          - url: git@salsa.debian.org:ubuntu-desktop-helper/geary.git
+          - url: git@salsa.debian.org:ubuntu-desktop-helper/gnome-calculator.git
+          - url: git@salsa.debian.org:ubuntu-desktop-helper/gnome-system-monitor.git
+          - url: git@salsa.debian.org:ubuntu-desktop-helper/orca.git
             branch: debian/sid
-          - url: git@salsa.debian.org:gnome-team/gnome-flashback.git
-          - url: git@salsa.debian.org:gnome-team/evince.git
-          - url: git@salsa.debian.org:gnome-team/gnome-boxes.git
-          - url: git@salsa.debian.org:gnome-team/gnome-remote-desktop.git
-          - url: git@salsa.debian.org:gnome-team/gnome-backgrounds.git
-          - url: git@salsa.debian.org:gnome-team/gnome-connections.git
+          - url: git@salsa.debian.org:ubuntu-desktop-helper/gnome-flashback.git
+          - url: git@salsa.debian.org:ubuntu-desktop-helper/evince.git
+          - url: git@salsa.debian.org:ubuntu-desktop-helper/gnome-boxes.git
+          - url: git@salsa.debian.org:ubuntu-desktop-helper/gnome-remote-desktop.git
+          - url: git@salsa.debian.org:ubuntu-desktop-helper/gnome-backgrounds.git
+          - url: git@salsa.debian.org:ubuntu-desktop-helper/gnome-connections.git
     runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
