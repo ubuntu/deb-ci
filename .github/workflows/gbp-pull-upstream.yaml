@@ -73,11 +73,11 @@ jobs:
         run: |
           cd project
           git checkout --track origin/pristine-tar
-          git rebase salsa.gnome/pristine-tar
+          git pull salsa.gnome/pristine-tar
           git checkout --track origin/upstream/latest
-          git rebase salsa.gnome/upsteam/latest
+          git pull salsa.gnome/upsteam/latest
           git checkout ${{ inputs.branch }}
-          git rebase salsa.gnome/${{ inputs.branch }}
+          git pull salsa.gnome/${{ inputs.branch }}
       - name: Rebase Patches
         run: |
           cd project
