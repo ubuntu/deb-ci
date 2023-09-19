@@ -65,16 +65,17 @@ jobs:
           git clone ${{ inputs.repo }} project
           cd project
           git remote add upstreamvcs $(grep -r Repository: debian/upstream/metadata | cut -c 13-)
-          git remote add salsa.bot git@salsa.debian.org:${{ secrets.LP_USER }}/${{ steps.parse-project-name.outputs.name }}.git
+          git remote add salsa.gnome git@salsa.debian.org:gnome-team/${{ steps.parse-project-name.outputs.name }}.git
           git fetch --all
           git config user.email ${{ secrets.LP_EMAIL }}
           git config user.name "${{ secrets.LP_USER }}"
       - name: Checkout Branches
         run: |
           cd project
-          git checkout --track origin/pristine-tar
-          git checkout --track origin/upstream/latest
-          git checkout ${{ inputs.branch }}
+          git checkout --track salsa.gnome/pristine-tar
+          git checkout --track salsa.gnome/upstream/latest
+          git branch -D ${{ inputs.branch }}
+          git checkout --track salsa.gnome/${{ inputs.branch }}
       - name: Rebase Patches
         run: |
           cd project
@@ -87,12 +88,13 @@ jobs:
           cd project
           gbp import-orig --uscan --no-interactive
       - name: Push Branches
+        id: push-to-remote
         run: |
           cd project
-          git push salsa.bot upstream/latest --force
-          git push salsa.bot pristine-tar --force
-          git push salsa.bot ${{ inputs.branch }} --force
-          git push salsa.bot --tags
+          git push origin upstream/latest --force
+          git push origin pristine-tar --force
+          git push origin ${{ inputs.branch }} --force
+          git push origin --tags --force
       - name: Create Issue
         if: failure()
         uses: JasonEtco/create-an-issue@v2
@@ -117,14 +119,12 @@ jobs:
         run: |
           rm -rf ~/.ssh
           rm -rf ~/.gnugp
-    outputs:
-      project-name: ${{ steps.parse-project-name.outputs.name }}
   gbp-build:
     uses: ./.github/workflows/gbp-build.yaml
     needs: [gbp-pull-upstream]
     secrets: inherit
     with:
-      repo: git@salsa.debian.org:gnome-team/${{ needs.gbp-pull-upstream.outputs.project-name }}.git
+      repo: ${{ inputs.repo }}
       branch: ${{ inputs.branch }}
       series: mantic
   mm-notify:
