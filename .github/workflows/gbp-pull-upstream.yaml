@@ -72,12 +72,10 @@ jobs:
       - name: Checkout Branches
         run: |
           cd project
-          git checkout --track origin/pristine-tar
-          git pull salsa.gnome/pristine-tar
-          git checkout --track origin/upstream/latest
-          git pull salsa.gnome/upsteam/latest
-          git checkout ${{ inputs.branch }}
-          git pull salsa.gnome/${{ inputs.branch }}
+          git checkout --track salsa.gnome/pristine-tar
+          git checkout --track salsa.gnome/upstream/latest
+          git branch -D ${{ inputs.branch }}
+          git checkout --track salsa.gnome/${{ inputs.branch }}
       - name: Rebase Patches
         run: |
           cd project
