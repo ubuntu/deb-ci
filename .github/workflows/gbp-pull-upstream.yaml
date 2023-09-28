@@ -23,6 +23,7 @@ on:
 
 env:
   DEBEMAIL: ${{ secrets.LP_EMAIL }}
+  DEBFULLNAME: ${{ secrets.LP_USER }}
 
 jobs:
   gbp-pull-upstream:
